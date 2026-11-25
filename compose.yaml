@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: smart_jobs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - smart_jobs_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d smart_jobs"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    ports: []
+
+  migrate:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/smart_jobs
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["uv", "run", "alembic", "upgrade", "head"]
+    restart: "no"
+
+  api:
+    build: .
+    environment:
+      APP_ENV: local
+      TZ: UTC
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/smart_jobs
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  smart_jobs_db:
