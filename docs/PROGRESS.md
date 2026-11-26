@@ -107,6 +107,9 @@ Pendências e bloqueios:
 - Retenção confirmada: excluir trechos após a resposta do modelo.
 - Modelo Ollama confirmado: `llama3.2:3b`.
 - Orçamento real ainda não autorizado; nenhuma chamada foi feita ao Ollama.
+- Commit local criado: `78ea059 feat: establish smart-jobs phases 0-3`.
+- Remoto configurado para `https://github.com/douglaza/smart-jobs.git`.
+- Push pendente: ambiente não possui credenciais GitHub para autenticar HTTPS.
 
 Próxima fase proposta:
 - Fase 4: rascunhos, aprovação vinculada a hash e acompanhamento manual.
