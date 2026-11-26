@@ -38,5 +38,36 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
 
+  db-test:
+    image: postgres:17-alpine
+    profiles: ["test"]
+    environment:
+      POSTGRES_DB: smart_jobs_test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    volumes:
+      - smart_jobs_test_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d smart_jobs_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 12
+
+  integration-tests:
+    build: .
+    profiles: ["test"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://test_user:test_password@db-test:5432/smart_jobs_test
+    depends_on:
+      db-test:
+        condition: service_healthy
+    command:
+      [
+        "sh",
+        "-c",
+        "uv run --group dev alembic upgrade head && uv run --group dev pytest tests/integration",
+      ]
+
 volumes:
   smart_jobs_db:
+  smart_jobs_test_db:

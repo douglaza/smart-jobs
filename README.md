@@ -56,3 +56,22 @@ Esse teste só é executado com `DATABASE_URL` configurado e um banco isolado.
 A avaliação não chama provedores externos enquanto a rubrica e a retenção não estiverem
 confirmadas. A configuração local do Ollama pode definir `OLLAMA_MODEL`; sem modelo,
 nenhuma avaliação é criada como concluída.
+
+## Fase 4 — rascunhos e acompanhamento manual
+
+Rascunhos são digitados manualmente, versionados como revisões imutáveis e cada afirmação
+profissional é vinculada a fatos do perfil marcados como confirmados. Aprovações
+registram o hash e a ação exata; uma revisão nova não herda a aprovação anterior.
+Candidaturas são registros locais:
+nenhum endpoint envia candidatura. A transição para `sent` exige confirmação humana
+explícita e grava evento na mesma transação que altera o estado.
+
+Para executar as integrações em um PostgreSQL isolado do banco local:
+
+```bash
+docker compose --profile test run --rm integration-tests
+```
+
+O serviço `db-test` usa o volume exclusivo `smart_jobs_test_db`, separado do banco
+pessoal. Ele preserva os dados sintéticos entre reinícios; não use dados pessoais nesse
+ambiente.
